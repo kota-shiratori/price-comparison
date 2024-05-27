@@ -1,2 +1,25 @@
-node_modules
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
 .env
+
+# Optional npm cache directory
+.npm
+
+# Optional REPL history
+.node_repl_history
+
+# Logs
+logs
+*.log
+logs/*.log
+
+# Dependency directories
+jspm_packages/
+
+# Optional eslint cache
+.eslintcache
+
+# Mac OS
+.DS_Store
