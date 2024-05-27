@@ -1,6 +1,7 @@
 const fs = require("fs");
 const { google } = require("googleapis");
 const { chromium } = require("playwright");
+import { GOOGLE_SHEET_ID } from "./env";
 
 // Google Sheets APIの認証
 const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
@@ -39,7 +40,7 @@ async function authorize() {
 
 async function writeDataToSheet(auth, data) {
   const sheets = google.sheets({ version: "v4", auth });
-  const spreadsheetId = "YOUR_SPREADSHEET_ID";
+  const spreadsheetId = GOOGLE_SHEET_ID;
   const range = "Sheet1!A1";
 
   const values = [
@@ -62,7 +63,7 @@ async function writeDataToSheet(auth, data) {
       if (err) {
         console.error(err);
       } else {
-        console.log(`${result.updatedCells} cells updated.`);
+        console.log(`${result.data.updatedCells} cells updated.`);
       }
     }
   );
@@ -78,12 +79,18 @@ async function scrapeRakuten() {
   const products = await page.evaluate(() => {
     return Array.from(document.querySelectorAll(".searchresultitem")).map(
       (product) => ({
-        title: product.querySelector(".title").innerText,
-        price: product.querySelector(".price").innerText,
+        title: product.querySelector(".title")
+          ? product.querySelector(".title").innerText
+          : "No Title",
+        price: product.querySelector(".price")
+          ? product.querySelector(".price").innerText
+          : "No Price",
         rating: product.querySelector(".reviewAverage")
           ? product.querySelector(".reviewAverage").innerText
           : "0",
-        link: product.querySelector(".title a").href,
+        link: product.querySelector(".title a")
+          ? product.querySelector(".title a").href
+          : "No Link",
       })
     );
   });
@@ -102,14 +109,18 @@ async function scrapeAmazon() {
   const products = await page.evaluate(() => {
     return Array.from(document.querySelectorAll(".s-result-item")).map(
       (product) => ({
-        title: product.querySelector("h2 a span").innerText,
+        title: product.querySelector("h2 a span")
+          ? product.querySelector("h2 a span").innerText
+          : "No Title",
         price: product.querySelector(".a-price-whole")
           ? product.querySelector(".a-price-whole").innerText
-          : "価格情報なし",
+          : "No Price",
         rating: product.querySelector(".a-icon-alt")
           ? product.querySelector(".a-icon-alt").innerText.split(" ")[0]
           : "0",
-        link: product.querySelector("h2 a").href,
+        link: product.querySelector("h2 a")
+          ? product.querySelector("h2 a").href
+          : "No Link",
       })
     );
   });
